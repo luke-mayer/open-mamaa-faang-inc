@@ -1,12 +1,10 @@
 package core;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 import characters.*;
 import gameObjects.*;
-import characters.Character;
 import static core.Story.*;
 import static core.GameUtility.*;
 
@@ -29,6 +27,13 @@ public class Game implements Serializable {
                 "Must be part of their move to an open concept they talked about a few years ago. \n" +
                 "You see someone a few years older than you hunched over their desk, blankly staring at their screen while steadily typing. \n" +
                 "Is that drool in the corner of their mouth?*");
+
+        // Initial Containers and Items
+        Container container;
+        container = new Container("Cubicle Desk Drawer", "To be filled in later", Action.DESK_DRAWER);
+        container.addItem(new Item("Paperclip","To be filled in later"));
+        container.addItem(new Item("Stapler","To be filled in later"));
+        container.addItem(new Item("Gum","To be filled in later"));
 
         // Initial storyStops
         Story.addStoryStop(LocationName.SAM_OFFICE);
@@ -139,9 +144,9 @@ public class Game implements Serializable {
         printSeparator(30);
         System.out.println();
         if(!player.inventoryIsEmpty()) {
-            Iterator<String> iterator = player.getInventory();
+            Iterator<Item> iterator = player.getInventory();
             while(iterator.hasNext()) {
-                System.out.println(" - " + iterator.next());
+                System.out.println(" - " + iterator.next().getName());
             }
         }else{
             System.out.println(" - Inventory is empty.");
@@ -200,6 +205,181 @@ public class Game implements Serializable {
         anyInput();
     }
 
+    // Removes an item from your inventory and stows it in the provided Container
+    // ToDo
+    // Can cause issues if player accesses menu, inventory, or objectives while mid decision
+    public void stowInContainer(Container container){
+        int choice = 0, printedIndx = 0;
+
+        do {
+            clearConsole();
+            printSeparator(30);
+            System.out.print("INVENTORY");
+            printSeparator(30);
+            System.out.println();
+            if (player.inventoryIsEmpty() && choice != -1) {
+                System.out.println("No way! I'm never parting ways with my dust bunnies!");
+                System.out.println("*You do not have any items to stow and your dust bunnies shall never leave your side*");
+            } else {
+                do {
+                    System.out.println("*Choose an item to stow*");
+                    // Printing all the items in the player's inventory
+                    for (int i = 0; i < player.numInventoryItems(); i++) {
+                        Item item = player.getItemFromInventory(i);
+                        printedIndx = i + 1;
+                        System.out.println("(" + printedIndx + ") " + item.getName());
+                    }
+                    System.out.println("(" + ++printedIndx + ") Leave");
+
+                    choice = userChoice("->", printedIndx);
+                }while(choice < 1);
+                if(choice == printedIndx){ // If player chose to leave without stowing anything
+                    return;
+                }else{
+                    Item item = player.getItemFromInventory(choice - 1);
+                    player.removeItem(item);
+                    container.addItem(item);
+
+                    clearConsole();
+                    printSeparator(30);
+                    System.out.print("INVENTORY");
+                    printSeparator(30);
+                    System.out.println();
+                    if(player.numInventoryItems() > 0){ // If player's inventory still has items
+                        printedIndx = 1;
+                        System.out.println("(" + printedIndx + ") Stow another item");
+                    }else{
+                        printedIndx = 0;
+                    }
+                }
+            }
+            System.out.println("(" + ++printedIndx + ") Take an item");
+            System.out.println("(" + ++printedIndx + ") Leave");
+
+            choice = userChoice("->", printedIndx);
+        }while(choice < 1);
+
+        if(printedIndx > 2){ //If player's inventory has items
+            switch(choice){
+                case 1:
+                    stowInContainer(container);
+                    break;
+                case 2:
+                    takeFromContainer(container);
+                    break;
+            }
+        }else if(choice == 2){ // If container is empty
+            takeFromContainer(container);
+        }
+    }
+
+    // Take an item from a container and stow it
+    // ToDo
+    // Can cause issues if player accesses menu, inventory, or objectives while mid decision
+    public void takeFromContainer(Container container){
+        int choice = 0, printedIndx = 0;
+
+        do {
+            clearConsole();
+            printSeparator(30);
+            System.out.print(container.getName());
+            printSeparator(30);
+            System.out.println();
+            if (container.numItems() < 1 && choice != -1) {
+                System.out.println("Heck yeah! Another dust bunny for my collection!");
+                System.out.println("*There are no items to take, but congrats on the dust bunny*");
+            } else {
+                do {
+                    System.out.println("*Choose an item to take*");
+                    // Printing all the items in this container
+                    for (int i = 0; i < container.numItems(); i++) {
+                        Item item = container.getItem(i);
+                        printedIndx = i + 1;
+                        System.out.println("(" + printedIndx + ") " + item.getName());
+                    }
+                    System.out.println("(" + ++printedIndx + ") Leave");
+
+                    choice = userChoice("->", printedIndx);
+                }while(choice < 1);
+                if(choice == printedIndx){ // If player chose to leave without taking anything
+                    return;
+                }else{
+                    Item item = container.getItem(choice - 1);
+                    container.removeItem(item);
+                    player.addToInventory(item);
+
+                    clearConsole();
+                    printSeparator(30);
+                    System.out.print(container.getName());
+                    printSeparator(30);
+                    System.out.println();
+                    if(container.numItems() > 0){ // If container still has items
+                        printedIndx = 1;
+                        System.out.println("(" + printedIndx + ") Take another item");
+                    }else{
+                        printedIndx = 0;
+                    }
+                }
+            }
+            System.out.println("(" + ++printedIndx + ") Stow an item from your inventory");
+            System.out.println("(" + ++printedIndx + ") Leave");
+
+            choice = userChoice("->", printedIndx);
+        }while(choice < 1);
+
+        if(printedIndx > 2){ //If container has items
+            switch(choice){
+                case 1:
+                    takeFromContainer(container);
+                    break;
+                case 2:
+                    stowInContainer(container);
+                    break;
+            }
+        }else if(choice == 2){ // If container is empty
+            stowInContainer(container);
+        }
+    }
+
+    // Prints the contents of a Container and gives the player the option to take an item or put an item
+    public void openContainer(Action action){
+        int choice;
+        Container container = Container.getContainer(action);
+
+        clearConsole();
+        printSeparator(30);
+        System.out.print(container.getName());
+        printSeparator(30);
+        System.out.println();
+        if(container.numItems() > 0) {
+            for(int i = 0; i < container.numItems(); i++){
+                String itemName = container.getItem(i).getName();
+                System.out.println(" - " + itemName);
+            }
+        }else{
+            System.out.println(" - A whole bunch of nothing");
+        }
+
+        do {
+            System.out.println("Would you like to take an item or stow an item from your inventory?");
+            System.out.println("*WARNING - Taking or stowing an item may have consequences in certain circumstances*");
+            System.out.println("(1) Take an item and add it to your inventory");
+            System.out.println("(2) Add an item from your inventory");
+            System.out.println("(3) Best to leave things as is");
+            choice = userChoice("->", 3);
+        }while(choice < 1);
+
+        switch(choice){
+            case 1:
+                takeFromContainer(container);
+                break;
+            case 2:
+                stowInContainer(container);
+                break;
+        }
+
+    }
+
     // Performs the given action by calling the associated method
     public void performAction(Action action){
         switch(action){
@@ -207,8 +387,7 @@ public class Game implements Serializable {
                 readDescription("Cubicle Hole");
                 break;
             case Action.DESK_DRAWER:
-                // openContainer();
-                System.out.println("Temp DESK_DRAWER action");
+                openContainer(action);
                 break;
             case Action.COMPUTER_LOGIN:
                 // loginComputer();
@@ -253,7 +432,7 @@ public class Game implements Serializable {
         do {
             printSeparator(SEP_LENGTH);
             System.out.println();
-            System.out.println("*Choose a location to move to or stay*");
+            System.out.println("*Choose a location to move to or choose to stay where you are*");
             printedIndx = 0;
             // Printing all the actions in this location
             for (int i = 0; i < curLocation.numNeighbors(); i++) {
@@ -268,7 +447,7 @@ public class Game implements Serializable {
         }while(choice < 1);
 
         if(choice != printedIndx){ // Choose an action
-            LocationName newLocation = curLocation.getNeighbor(printedIndx);
+            LocationName newLocation = curLocation.getNeighbor(choice - 1);
             player.setLocation(newLocation);
         }
     }
@@ -299,7 +478,7 @@ public class Game implements Serializable {
         scan.nextLine(); // Clears input
 
         int choice;
-        // Prompts user for name until they confirm it
+        // Prompts user for player name until they confirm it
         do{
             System.out.print("\nEnter your name: ");
             name = scan.nextLine();

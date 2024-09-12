@@ -25,14 +25,14 @@ public class Location {
         this.description = description;
     }
 
-    // Returns the indicated Location object from the gameLocations HashMap or null if not in gameLocations
-    public static Location getLocation(LocationName locName){
-        return gameLocations.get(locName);
-    }
-
     // Get this Location's name
     public LocationName getLocationName(){
         return this.name;
+    }
+
+    // Returns the indicated Location object from the gameLocations HashMap or null if not in gameLocations
+    public static Location getLocation(LocationName locName){
+        return gameLocations.get(locName);
     }
 
     // Get the number of neighbors

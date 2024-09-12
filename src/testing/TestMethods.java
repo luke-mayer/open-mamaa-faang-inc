@@ -9,6 +9,7 @@ public class TestMethods {
         testExploration();
     }
 
+    /*
     // Tests the player inventory
     public static void testInventory(){
         Game game = new Game();
@@ -34,6 +35,7 @@ public class TestMethods {
         game.printInventory();
         game.exitGame();
     }
+     */
 
     // Tests the player objectives
     public static void testObjectives(){

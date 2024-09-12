@@ -1,11 +1,13 @@
 package characters;
+import gameObjects.Item;
 import gameObjects.LocationName;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Player extends Character{
-    private final ArrayList<String> inventory, objectives; // Package visibility for ease of access and manipulation
+    private final ArrayList<String> objectives; // Package visibility for ease of access and manipulation
+    private final ArrayList<Item> inventory;
 
     // Constructor for the Player
     public Player(String name, LocationName location){
@@ -15,12 +17,12 @@ public class Player extends Character{
     }
 
     // Adds the provided item to the player's inventory
-    public void addToInventory(String item){
+    public void addToInventory(Item item){
         inventory.add(item);
     }
 
     // Removes the indicated item from the player's inventory, returns -1 if item is not in inventory
-    public int removeItem(String item){
+    public int removeItem(Item item){
         if(!inventory.contains(item)){
             return -1;
         }
@@ -33,9 +35,19 @@ public class Player extends Character{
         return inventory.isEmpty();
     }
 
+    // Returns the number of Items in the player's inventory
+    public int numInventoryItems(){
+        return inventory.size();
+    }
+
     // Gets an iterator for the player's inventory
-    public Iterator<String> getInventory(){
+    public Iterator<Item> getInventory(){
         return inventory.iterator();
+    }
+
+    // Gets an Item from the player's inventory
+    public Item getItemFromInventory(int indx){
+        return inventory.get(indx);
     }
 
     // Adds the provided objective to the player's objectives
