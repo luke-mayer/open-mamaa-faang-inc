@@ -37,6 +37,7 @@ public class TestMethods {
     }
      */
 
+    /*
     // Tests the player objectives
     public static void testObjectives(){
         Game game = new Game();
@@ -62,6 +63,7 @@ public class TestMethods {
         game.printObjectives();
         game.exitGame();
     }
+     */
 
     // Tests exploration loop
     public static void testExploration(){

@@ -1,12 +1,13 @@
 package characters;
 import gameObjects.Item;
 import gameObjects.LocationName;
+import gameObjects.Objective;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Player extends Character{
-    private final ArrayList<String> objectives; // Package visibility for ease of access and manipulation
+    private final ArrayList<Objective> objectives; // Package visibility for ease of access and manipulation
     private final ArrayList<Item> inventory;
 
     // Constructor for the Player
@@ -51,12 +52,12 @@ public class Player extends Character{
     }
 
     // Adds the provided objective to the player's objectives
-    public void addToObjectives(String objective){
+    public void addToObjectives(Objective objective){
         objectives.add(objective);
     }
 
     // Removes the indicated objective from the player's objectives, returns -1 if objective is not in objectives
-    public int removeObjective(String objective){
+    public int removeObjective(Objective objective){
         if(!objectives.contains(objective)){
             return -1;
         }
@@ -70,7 +71,7 @@ public class Player extends Character{
     }
 
     // Gets an iterator for the player's objectives
-    public Iterator<String> getObjectives(){
+    public Iterator<Objective> getObjectives(){
         return objectives.iterator();
     }
 

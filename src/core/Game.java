@@ -14,31 +14,34 @@ public class Game implements Serializable {
     private boolean isRunning;
 
     public Player player; // Change to private after development
-    public characters.NPC sam;
+    public characters.NPC sam, deb;
 
     // Constructs a new Game
     public Game(){
         currentDay = 0;
         isRunning = true;
-        sam = new NPC("Sam Altmuckerburg", LocationName.SAM_OFFICE,3);
+        sam = new NPC("Sam Altmuckerburg", LocationName.SAM_OFFICE,5);
+        deb = new NPC("Deborah <TBD>", LocationName.ELEVATOR, 3);
 
-        // Initial Things
-        new Thing("Cubicle Hole","*It looks like someone cut a square out of the cubicle with a box cutter. \n" +
-                "Must be part of their move to an open concept they talked about a few years ago. \n" +
-                "You see someone a few years older than you hunched over their desk, blankly staring at their screen while steadily typing. \n" +
-                "Is that drool in the corner of their mouth?*");
+        // Initializing starting game objects
+        initializeContainersItems();
+        initializeLocationsActions();
+        initializeStoryStops();
+        initializeThings();
+    }
 
-        // Initial Containers and Items
+    // Initializes starting containers and Items present in the beginning of the game
+    public void initializeContainersItems(){
         Container container;
+        // Cubicle desk drawer and items
         container = new Container("Cubicle Desk Drawer", "To be filled in later", Action.DESK_DRAWER);
         container.addItem(new Item("Paperclip","To be filled in later"));
         container.addItem(new Item("Stapler","To be filled in later"));
         container.addItem(new Item("Gum","To be filled in later"));
+    }
 
-        // Initial storyStops
-        Story.addStoryStop(LocationName.SAM_OFFICE);
-
-        // Initial locations with their neighbors and actions
+    // Initializes the starting Locations and Actions present in the beginning of the game
+    public void initializeLocationsActions(){
         Location location;
 
         location = new Location(LocationName.CUBICLE, "*A cramped, gray cubicle which has a small opening on one side.\n" +
@@ -54,6 +57,19 @@ public class Game implements Serializable {
         location = new Location(LocationName.BASEMENT,"*A hallway that connects to the Server room...\n" +
                 "They should really do something about this flickering light.*");
         location.addNeighbor(LocationName.STAIRS);
+    }
+
+    // Initializes the starting storyStops present in the beginning of the game
+    public void initializeStoryStops(){
+        Story.addStoryStop(LocationName.SAM_OFFICE);
+    }
+
+    // Initializes the starting Things present in the beginning of the game
+    public void initializeThings(){
+        new Thing("Cubicle Hole","*It looks like someone cut a square out of the cubicle with a box cutter. \n" +
+                "Must be part of their move to an open concept they talked about a few years ago. \n" +
+                "You see someone a few years older than you hunched over their desk, blankly staring at their screen while steadily typing. \n" +
+                "Is that drool in the corner of their mouth?*");
     }
 
     // Increments the day
@@ -163,7 +179,7 @@ public class Game implements Serializable {
         printSeparator(30);
         System.out.println();
         if(!player.objectivesIsEmpty()) {
-            Iterator<String> iterator = player.getObjectives();
+            Iterator<Objective> iterator = player.getObjectives();
             while(iterator.hasNext()) {
                 System.out.println(" - " + iterator.next());
             }
@@ -402,7 +418,9 @@ public class Game implements Serializable {
         int choice, printedIndx;
 
         do {
-            printSeparator(SEP_LENGTH);
+            printSeparator(30);
+            System.out.print(curLocation.getLocationName());
+            printSeparator(30);
             System.out.println();
             System.out.println("*Take an action or leave to go to another location*");
             printedIndx = 0;
@@ -430,7 +448,9 @@ public class Game implements Serializable {
         int choice, printedIndx;
 
         do {
-            printSeparator(SEP_LENGTH);
+            printSeparator(30);
+            System.out.print(curLocation.getLocationName());
+            printSeparator(30);
             System.out.println();
             System.out.println("*Choose a location to move to or choose to stay where you are*");
             printedIndx = 0;
@@ -461,7 +481,7 @@ public class Game implements Serializable {
     }
 
 
-    // Starts a new game
+    // Starts a new game, includes intro and player name selection
     public void startGame(){
         boolean nameConfirmed = false;
         String name;
@@ -470,9 +490,6 @@ public class Game implements Serializable {
         printHeading("Welcome to OpenMAMMAFAANG inc.");
         delayMs(2000);
         anyInput();
-        nextDay();
-        printDay();
-        delayMs(1000);
         introPart1(); // Story up to user inputting name
         printSeparator(SEP_LENGTH);
         scan.nextLine(); // Clears input
@@ -493,5 +510,58 @@ public class Game implements Serializable {
         }while(!nameConfirmed);
 
         player = new Player(name, LocationName.CUBICLE); // Creating Player with given name
+        introPart2();
+    }
+
+    // Runs through Day 1 of the game
+    public void dayOne(){
+        int choice;
+
+        nextDay();
+        // Initializing starting game objects
+        initializeContainersItems();
+        initializeLocationsActions();
+        initializeStoryStops();
+        initializeThings();
+
+        dayOneIntro(); // Opening game notes and welcome message
+        clearConsole();
+        printDay();
+        delayMs(1000);
+        anyInput();
+
+        // Exploration will stop and story will continue at first visit to Sam's Office
+        addStoryStop(LocationName.SAM_OFFICE);
+        explorationLoop(); // Exploration until player visits Sam's Office
+        removeStoryStop(player.getLocation()); // Removes Sam's office
+
+        clearConsole();
+        printSeparator(30);
+        System.out.print(player.getLocation());
+        printSeparator(30);
+        dayOneSamOffice();
+
+
+        do{
+            printSeparator(SEP_LENGTH);
+            System.out.println();
+            System.out.println("(1) I'm on it boss! You can count on me!");
+            System.out.println("(2) Okay.");
+            System.out.println("(3) Sorry... feed the...?");
+
+            choice = userChoice("->",3);
+            if(choice < 1){
+                System.out.println("*Sam just asked you to feed the A.I. models*");
+            }
+        }while(choice < 1);
+
+        if(choice == 1){
+            printLine("Good lad! Just head downstairs. Deb will show you how it's done.");
+            printLine("*Sam appreciated your eagerness to please and lack of annoying questions*");
+            sam.improveOpinion(1);
+        }else if(choice == 3){
+            printLine("Just head downstairs. Deb will answer your questions. Now chop chop!");
+        }
+        player.addToObjectives(Objective.FEED_AI);
     }
 }

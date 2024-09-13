@@ -4,6 +4,8 @@ public enum Action {
     CUBICLE_HOLE("Look through the small opening"),
     DESK_DRAWER("Look in the desk drawer"), // The Container in the player's cubicle
     COMPUTER_LOGIN("Login to the computer"),
+
+    FEED_AI("Feed Clyde and Toby"),
     ;
 
     private final String actionStr;

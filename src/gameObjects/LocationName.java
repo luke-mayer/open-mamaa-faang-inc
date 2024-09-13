@@ -1,11 +1,11 @@
 package gameObjects;
 
 public enum LocationName {
-    CUBICLE("Your cubicle"),
-    SAM_OFFICE("Sam's office"),
-    STAIRS("The stairs"),
-    ELEVATOR("The elevator"),
-    BASEMENT("The basement"), // Where the AI models reside
+    CUBICLE("Your Cubicle"),
+    SAM_OFFICE("Sam's Office"),
+    STAIRS("The Stairs"),
+    ELEVATOR("The Elevator"),
+    BASEMENT("The Basement"), // Where the AI models reside
     ;
 
     private final String locationStr;
