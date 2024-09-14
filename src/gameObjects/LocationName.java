@@ -5,7 +5,8 @@ public enum LocationName {
     SAM_OFFICE("Sam's Office"),
     STAIRS("The Stairs"),
     ELEVATOR("The Elevator"),
-    BASEMENT("The Basement"), // Where the AI models reside
+    BASEMENT("The Basement"),
+    SERVER_ROOM("Server Room"), // Where the AI models reside
     ;
 
     private final String locationStr;

@@ -94,7 +94,7 @@ public class Story {
     }
 
     // Day 1 - Sam's Office storyStop
-    public static void dayOneSamOffice(){
+    public static void dayOnePart1(){
         printLine("*The door is open so you knock on the door frame. \n" +
                 "Sam looks up at you from his desk*");
         printLine("Sam: Oh hey, feeling settled in?");
@@ -112,5 +112,38 @@ public class Story {
         System.out.println();
         printLine("Sam: Fantastic! Now for your first assignment, super simple, super easy.");
         printLine("Sam: Just head downstairs and feed the A.I. models.");
+    }
+
+    // Day 1 - Meeting Deb and learning the ropes
+    public static void dayOnePart2(){
+        clearConsole();
+        System.out.println("*You leave Sam's office and begin heading towards the elevator. \n" +
+                "You pass by row upon row of lifeless cubicles when you notice a figure poke \n" +
+                "their head out from one of the colorless cells. A woman a few years older than \n" +
+                "you stands up just in time to match pace and heading with you as you journey towards \n" +
+                "the elevator.You go to make a formal greeting, but she holds up her hand to stop you*\n");
+        printLine("Woman: Thank you and its nice to meet you too. No fault of your own, but I don't have \n" +
+                "     time for this so let's cut the pleasantries and get this over with... That prick Sam, \n" +
+                "     wasting my time with his messes.\n");
+        System.out.println("*You hear her mutter that last bit as the two of you reach the elevator. \n" +
+                "This must be the \"Deb\" Sam was referring to... Wonder what mess she's talking about*\n");
+        delayMs(1000);
+        anyInput();
+
+        clearConsole();
+        System.out.println("*You both enter the elevator and Deb presses the button for the basement*\n");
+        printLine("Deb: Now, the A.I. models are stored in the server room. There are two of them and they \n" +
+                "     each have their own terminal. Clyde is the fancy one hooked up to the main server, \n" +
+                "     Toby is the sad thing in the back of the room. As for what you're going to feed them, \n" +
+                "     it gets bought in fresh overnight from an outside company and left in the safe by  \n" +
+                "     the front. Here's the passcode... It's get changed on occasion. I give you the new one \n" +
+                "     when you need it.\n");
+        System.out.println("*She hands you a note with the passcode: 065-073. You tuck it in your pocket as \n" +
+                "Deb leads you out of the elevator, through a hallway, and into the server room*\n");
+        printLine("Deb: Give Clyde the big one and Toby the small one. Clyde is a bit of his prick, but \n" +
+                "     Toby is a sweet old thing. Alright, that should about cover it.\n");
+        System.out.println("*She swiftly leaves before you can ask any of your numerous questions*\n");
+        delayMs(1000);
+        anyInput();
     }
 }
