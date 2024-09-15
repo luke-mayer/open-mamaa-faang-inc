@@ -1,7 +1,10 @@
 package gameObjects;
 
 public enum Objective {
-    FEED_AI("Feed the A.I. models in the Server Room (located in the Basement)", Action.FEED_AI),
+    FEED_AI("Feed the A.I. models in the Server Room (located in the Basement)",
+            Action.FEED_AI),
+    FIND_THE_BUG("Find the BUG running amuck in the company codebase (you can do this " +
+            "from your cubicle", Action.FIND_THE_BUG),
     ;
 
     private final String objectiveStr;

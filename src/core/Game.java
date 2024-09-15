@@ -11,32 +11,32 @@ import static core.GameUtility.*;
 public class Game implements Serializable {
 
     private int currentDay;
-    private boolean isRunning;
     private String safeCode;
 
-    public Player player; // Change to private after development
+    private Player player; // Change to private after development
     public characters.NPC sam, deb;
 
     // Constructs a new Game
     public Game(){
         currentDay = 0;
-        isRunning = true;
         sam = new NPC("Sam Altmuckerburg", LocationName.SAM_OFFICE,5);
         deb = new NPC("Deborah <TBD>", LocationName.ELEVATOR, 3);
     }
 
     // Constructor for testing
-    public Game(int unused){
+    public Game(String playerName, LocationName playerLocation){
         currentDay = 0;
-        isRunning = true;
         sam = new NPC("Sam Altmuckerburg", LocationName.SAM_OFFICE,5);
         deb = new NPC("Deborah <TBD>", LocationName.ELEVATOR, 3);
+        player = new Player(playerName,playerLocation);
 
         // Initializing starting game objects
         initializeContainersItems();
         initializeLocationsActions();
         initializeStoryStops();
         initializeThings();
+
+        safeCode = "065-073";
     }
 
     // Initializes starting containers and Items present in the beginning of the game
@@ -220,7 +220,6 @@ public class Game implements Serializable {
         scan.close();
         // ToDo
         // Maybe exit(0);
-        isRunning = false;
     }
 
     // Reads the description that corresponds with the provided Thing
@@ -491,7 +490,7 @@ public class Game implements Serializable {
 
     // Checks if user inputs correct safeCode. Returns "true" is correct, "false" is incorrect,
     // and "menu" if user accessed inventory, objective, or the pause menu
-    public String openSafe(String prompt){
+    public String openSafeInput(String prompt){
         System.out.print(prompt + " ");
         String userIn = scan.nextLine().strip().toLowerCase();
         switch (userIn) {
@@ -512,6 +511,26 @@ public class Game implements Serializable {
                     return "false";
                 }
         }
+    }
+
+    // Initiates an attempt at opening the safe in the Server Room
+    public void openSafe(){
+        String userSafeCode;
+        do {
+            clearConsole();
+            printSeparator(30);
+            System.out.print(player.getLocation());
+            printSeparator(30);
+            System.out.println("\n*Input the passcode please*");
+            userSafeCode = openSafeInput("->");
+            if(userSafeCode.equals("false")){
+                System.out.println("*INCORRECT*");
+                System.out.println("*Hint: Check your inventory*");
+                anyInput();
+            }
+        }while(!userSafeCode.equals("true"));
+        System.out.println("*CORRECT*");
+        anyInput();
     }
 
 
@@ -550,9 +569,9 @@ public class Game implements Serializable {
     // Runs through Day 1 of the game
     public void dayOne(){
         int choice;
-        String userSafeCode;
 
         nextDay();
+
         // Initializing starting game objects
         initializeContainersItems();
         initializeLocationsActions();
@@ -603,7 +622,7 @@ public class Game implements Serializable {
 
         // Day 1 Part 2
         dayOnePart2();
-        safeCode = "065-073";
+        safeCode = "065-073"; // Setting the safe code
         player.setLocation(LocationName.SERVER_ROOM);
 
         // Day 1 Part 3
@@ -614,20 +633,10 @@ public class Game implements Serializable {
         System.out.println("*You noticed the safe Deb referred to built into the wall just inside the \n" +
                 "doorway. You approach it and interact with the display on the front*\n");
         anyInput();
-        do {
-            clearConsole();
-            printSeparator(30);
-            System.out.print(player.getLocation());
-            printSeparator(30);
-            System.out.println("*Input the passcode please*");
-            userSafeCode = openSafe("->");
-            if(userSafeCode.equals("false")){
-                System.out.println("*INCORRECT*");
-                System.out.println("*Hint: Check your inventory*");
-                anyInput();
-            }
-        }while(!userSafeCode.equals("true"));
-        System.out.println("*CORRECT*");
-        anyInput();
+
+        openSafe(); // Opens the safe
+
+
+
     }
 }

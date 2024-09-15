@@ -3,11 +3,9 @@ package testing;
 import core.Game;
 import characters.*;
 import gameObjects.*;
+import miniGames.FindTheBug;
 
 public class TestMethods {
-    public static void main(String[] args) {
-        testExploration();
-    }
 
     /*
     // Tests the player inventory
@@ -67,10 +65,28 @@ public class TestMethods {
 
     // Tests exploration loop
     public static void testExploration(){
-        Game game = new Game();
-        game.player = new Player("Luke",LocationName.CUBICLE);
+        Game game = new Game("John TestName", LocationName.CUBICLE);
 
         game.explorationLoop();
-        System.out.println("Player's current location is: " + game.player.getLocation());
+        System.out.println("Reached a story stop");
+    }
+
+    // Tests the FindTheBug minigame
+    public static void testFindTheBug(){
+        System.out.println("Before FindTheBug");
+        new FindTheBug(16,3);
+        System.out.println("After FindTheBug made");
+        System.out.println("After FindTheBug");
+        System.out.println("Did I find the bug?: " + FindTheBug.getFoundBug());
+    }
+
+    // Tests the open safe mechanic in the game
+    public static void testOpenSafe(){
+        Game game = new Game("John TestName", LocationName.SERVER_ROOM);
+        game.openSafe();
+    }
+
+    public static void main(String[] args) {
+        testOpenSafe();
     }
 }

@@ -146,4 +146,9 @@ public class Story {
         delayMs(1000);
         anyInput();
     }
+
+    // Day 1 -
+    public static void dayOnePart3(){
+
+    }
 }

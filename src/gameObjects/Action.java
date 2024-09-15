@@ -6,6 +6,7 @@ public enum Action {
     COMPUTER_LOGIN("Login to the computer"),
 
     FEED_AI("Feed Clyde and Toby"),
+    FIND_THE_BUG("Find the bug in your software"),
     ;
 
     private final String actionStr;
