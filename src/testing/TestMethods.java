@@ -86,6 +86,11 @@ public class TestMethods {
         game.openSafe();
     }
 
+    // Tests pulling in a javaFX project
+    public static void testJavaFX(){
+
+    }
+
     public static void main(String[] args) {
         testOpenSafe();
     }
