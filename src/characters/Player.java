@@ -20,6 +20,7 @@ public class Player extends Character{
     // Adds the provided item to the player's inventory
     public void addToInventory(Item item){
         inventory.add(item);
+        System.out.println("*" + item.getName() + " added to inventory*");
     }
 
     // Removes the indicated item from the player's inventory, returns -1 if item is not in inventory
@@ -28,6 +29,7 @@ public class Player extends Character{
             return -1;
         }
         inventory.remove(item);
+        System.out.println("*" + item.getName() + " removed from inventory*");
         return 1;
     }
 
@@ -49,6 +51,11 @@ public class Player extends Character{
     // Gets an Item from the player's inventory
     public Item getItemFromInventory(int indx){
         return inventory.get(indx);
+    }
+
+    // Returns true if inventory contains the specified Item, false otherwise
+    public boolean inventoryContainsItem(Item item){
+        return inventory.contains(item);
     }
 
     // Adds the provided objective to the player's objectives

@@ -25,6 +25,11 @@ public class Location {
         this.description = description;
     }
 
+    // Gets the description of the location
+    public String getDescription(){
+        return description;
+    }
+
     // Get this Location's name
     public LocationName getLocationName(){
         return this.name;

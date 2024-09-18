@@ -5,6 +5,9 @@ import java.util.Iterator;
 
 import characters.*;
 import gameObjects.*;
+import miniGames.FindTheBug;
+import miniGames.catchTheCopilot.CatchTheCopilot;
+
 import static core.Story.*;
 import static core.GameUtility.*;
 
@@ -12,6 +15,7 @@ public class Game implements Serializable {
 
     private int currentDay;
     private String safeCode;
+    private boolean endDay;
 
     private Player player; // Change to private after development
     public characters.NPC sam, deb;
@@ -19,6 +23,7 @@ public class Game implements Serializable {
     // Constructs a new Game
     public Game(){
         currentDay = 0;
+        endDay = false;
         sam = new NPC("Sam Altmuckerburg", LocationName.SAM_OFFICE,5);
         deb = new NPC("Deborah <TBD>", LocationName.ELEVATOR, 3);
     }
@@ -26,6 +31,7 @@ public class Game implements Serializable {
     // Constructor for testing
     public Game(String playerName, LocationName playerLocation){
         currentDay = 0;
+        endDay = false;
         sam = new NPC("Sam Altmuckerburg", LocationName.SAM_OFFICE,5);
         deb = new NPC("Deborah <TBD>", LocationName.ELEVATOR, 3);
         player = new Player(playerName,playerLocation);
@@ -37,6 +43,37 @@ public class Game implements Serializable {
         initializeThings();
 
         safeCode = "065-073";
+    }
+
+    // Starts the game, choose between playing dayOne or one of the mini-games
+    public void startupMenu(){
+        int choice;
+
+        clearConsole();
+        printHeading("OpenMammaFAANG inc.");
+        System.out.println();
+        System.out.println("*This game is currently in development. Demo the beginning of the game \n" +
+                " or try out some of the mini-games that are integrated into the main game*\n");
+
+        do {
+            System.out.println("(1) Experience the first day working at OpenMammaFAANG inc.");
+            System.out.println("(2) Demo the Find The Bug mini-game");
+            System.out.println("(3) Demo the Catch The Copilot mini-game");
+            System.out.println("(4) EXIT");
+            choice = userChoice("->", 4);
+
+            switch(choice){
+                case 1:
+                    dayOne();
+                    break;
+                case 2:
+                    demoFindTheBug();
+                    break;
+                case 3:
+                    demoCatchTheCopilot();
+                    break;
+            }
+        }while(choice != 4 && choice != 1);
     }
 
     // Initializes starting containers and Items present in the beginning of the game
@@ -54,7 +91,7 @@ public class Game implements Serializable {
         Location location;
 
         location = new Location(LocationName.CUBICLE, "*A cramped, gray cubicle which has a small opening on one side.\n" +
-                "There is a tiny desk with a computer and a single drawer.*");
+                " There is a tiny desk with a computer and a single drawer.*");
         location.addAction(Action.CUBICLE_HOLE);
         location.addAction(Action.DESK_DRAWER);
         location.addAction(Action.COMPUTER_LOGIN);
@@ -64,8 +101,7 @@ public class Game implements Serializable {
         location.addNeighbor(LocationName.CUBICLE);
 
         location = new Location(LocationName.BASEMENT,"*A hallway that connects to the Server room...\n" +
-                "They should really do something about this flickering light.*");
-        location.addNeighbor(LocationName.STAIRS);
+                " They should really do something about this flickering light.*");
     }
 
     // Initializes the starting storyStops present in the beginning of the game
@@ -76,9 +112,9 @@ public class Game implements Serializable {
     // Initializes the starting Things present in the beginning of the game
     public void initializeThings(){
         new Thing("Cubicle Hole","*It looks like someone cut a square out of the cubicle with a box cutter. \n" +
-                "Must be part of their move to an open concept they talked about a few years ago. \n" +
-                "You see someone a few years older than you hunched over their desk, blankly staring at their screen while steadily typing. \n" +
-                "Is that drool in the corner of their mouth?*");
+                " Must be part of their move to an open concept they talked about a few years ago. \n" +
+                " You see someone a few years older than you hunched over their desk, blankly staring \n" +
+                " at their screen while steadily typing. Is that drool in the corner of their mouth?*");
     }
 
     // Increments the day
@@ -91,6 +127,14 @@ public class Game implements Serializable {
         clearConsole();
         String dayTitle = "DAY " + currentDay;
         printHeading(dayTitle);
+    }
+
+    // Prints a small heading with the current location
+    public void printLocation(){
+        printSeparator(30);
+        System.out.print(player.getLocation());
+        printSeparator(30);
+        System.out.println();
     }
 
     // Gets the user input from standard input and returns it as int, returns -1 if choices need to be reprinted.
@@ -218,6 +262,7 @@ public class Game implements Serializable {
     public void exitGame(){
         saveGame();
         scan.close();
+        System.exit(0);
         // ToDo
         // Maybe exit(0);
     }
@@ -225,7 +270,7 @@ public class Game implements Serializable {
     // Reads the description that corresponds with the provided Thing
     public void readDescription(String name){
         Thing thing = Thing.getThing(name);
-        printLine(thing.getDescription());
+        System.out.println(thing.getDescription());
         anyInput();
     }
 
@@ -388,7 +433,7 @@ public class Game implements Serializable {
             System.out.println("Would you like to take an item or stow an item from your inventory?");
             System.out.println("*WARNING - Taking or stowing an item may have consequences in certain circumstances*");
             System.out.println("(1) Take an item and add it to your inventory");
-            System.out.println("(2) Add an item from your inventory");
+            System.out.println("(2) Stow an item from your inventory");
             System.out.println("(3) Best to leave things as is");
             choice = userChoice("->", 3);
         }while(choice < 1);
@@ -411,12 +456,15 @@ public class Game implements Serializable {
                 readDescription("Cubicle Hole");
                 break;
             case Action.DESK_DRAWER:
+            case Action.LOOK_SAFE:
                 openContainer(action);
                 break;
             case Action.COMPUTER_LOGIN:
                 // loginComputer();
                 System.out.println("Temp COMPUTER_LOGIN action");
                 break;
+            case Action.END_DAY:
+                endDay = true;
         }
     }
 
@@ -426,9 +474,9 @@ public class Game implements Serializable {
         int choice, printedIndx;
 
         do {
-            printSeparator(30);
-            System.out.print(curLocation.getLocationName());
-            printSeparator(30);
+            printLocation();
+            System.out.println(Location.getLocation(player.getLocation()).getDescription());
+            printSeparator(SEP_LENGTH + player.getLocation().toString().length());
             System.out.println();
             System.out.println("*Take an action or leave to go to another location*");
             printedIndx = 0;
@@ -456,10 +504,7 @@ public class Game implements Serializable {
         int choice, printedIndx;
 
         do {
-            printSeparator(30);
-            System.out.print(curLocation.getLocationName());
-            printSeparator(30);
-            System.out.println();
+            printLocation();
             System.out.println("*Choose a location to move to or choose to stay where you are*");
             printedIndx = 0;
             // Printing all the actions in this location
@@ -482,7 +527,7 @@ public class Game implements Serializable {
 
     // The exploration loop, stops when a storyStop is reached
     public void explorationLoop(){
-        while(!containsStoryStop(player.getLocation())){
+        while(!containsStoryStop(player.getLocation()) && !endDay){
             chooseAction(); // Allows player to choose an available action in the current location
             moveLocations(); // Allows player to move to a neighboring location
         }
@@ -518,9 +563,7 @@ public class Game implements Serializable {
         String userSafeCode;
         do {
             clearConsole();
-            printSeparator(30);
-            System.out.print(player.getLocation());
-            printSeparator(30);
+            printLocation();
             System.out.println("\n*Input the passcode please*");
             userSafeCode = openSafeInput("->");
             if(userSafeCode.equals("false")){
@@ -529,23 +572,22 @@ public class Game implements Serializable {
                 anyInput();
             }
         }while(!userSafeCode.equals("true"));
-        System.out.println("*CORRECT*");
-        anyInput();
+        System.out.println("*CORRECT*\n");
     }
-
 
     // Starts a new game, includes intro and player name selection
     public void startGame(){
         boolean nameConfirmed = false;
         String name;
 
-        clearConsole();
-        printHeading("Welcome to OpenMAMMAFAANG inc.");
-        delayMs(2000);
+        printDay();
+        delayMs(1000);
+        printHeading("Welcome to OpenMammaFAANG inc.");
+        delayMs(1000);
         anyInput();
         introPart1(); // Story up to user inputting name
         printSeparator(SEP_LENGTH);
-        scan.nextLine(); // Clears input
+        //scan.nextLine(); // Clears input
 
         int choice;
         // Prompts user for player name until they confirm it
@@ -569,6 +611,8 @@ public class Game implements Serializable {
     // Runs through Day 1 of the game
     public void dayOne(){
         int choice;
+        boolean fedAI = false, completedFindBug = false, foundBug = false;
+        Item clydeSSD, tobyFloppy;
 
         nextDay();
 
@@ -580,20 +624,17 @@ public class Game implements Serializable {
 
         dayOneIntro(); // Opening game notes and welcome message
         clearConsole();
-        printDay();
-        delayMs(1000);
-        anyInput();
+        startGame();
 
         // Exploration will stop and story will continue at first visit to Sam's Office
         addStoryStop(LocationName.SAM_OFFICE);
+        clearConsole();
         explorationLoop(); // Exploration until player visits Sam's Office
         removeStoryStop(player.getLocation()); // Removes Sam's office
 
         // Day 1 Part 1
         clearConsole();
-        printSeparator(30);
-        System.out.print(player.getLocation());
-        printSeparator(30);
+        printLocation();
         dayOnePart1();
 
         do{
@@ -610,11 +651,11 @@ public class Game implements Serializable {
         }while(choice < 1);
 
         if(choice == 1){
-            printLine("Good lad! Just head downstairs. Deb will show you how it's done.");
-            printLine("*Sam appreciated your eagerness to please and lack of annoying questions*");
+            printLine("Sam: Good lad! Just head downstairs. Deb will show you how it's done.\n");
+            System.out.println("*Sam appreciated your eagerness to please and lack of annoying questions*");
             sam.improveOpinion(1);
         }else if(choice == 3){
-            printLine("Just head downstairs. Deb will answer your questions. Now chop chop!");
+            printLine("Sam: Just head downstairs. Deb will answer your questions. Now chop chop!");
         }
         delayMs(1000);
         anyInput();
@@ -623,20 +664,185 @@ public class Game implements Serializable {
         // Day 1 Part 2
         dayOnePart2();
         safeCode = "065-073"; // Setting the safe code
+        player.addToInventory(new Item("A note with the numbers \"065-073\"",
+                "A note with the numbers \"065-073\""));
         player.setLocation(LocationName.SERVER_ROOM);
 
         // Day 1 Part 3
         clearConsole();
-        printSeparator(30);
-        System.out.print(player.getLocation());
-        printSeparator(30);
-        System.out.println("*You noticed the safe Deb referred to built into the wall just inside the \n" +
-                "doorway. You approach it and interact with the display on the front*\n");
+        printLocation();
+        System.out.println("*You notice the safe Deb referred to built into the wall just inside the \n" +
+                " doorway. You approach it and interact with the display on the front*\n");
         anyInput();
 
         openSafe(); // Opens the safe
 
+        clydeSSD = new Item("Clyde's SSD", "The SSD that holds training " +
+                "data for Clyde");
+        tobyFloppy = new Item("Toby's floppy disk", "The floppy disk that " +
+                "holds Toby's training data");
+        player.addToInventory(clydeSSD);
+        player.addToInventory(tobyFloppy);
+        delayMs(1000);
+        anyInput();
 
+        clearConsole();
+        printLocation();
+        dayOnePart3();
 
+        do {
+            clearConsole();
+            printLocation();
+            printLine("Computer: Hi! I'm Toby. It's so nice to meet you!");
+            printSeparator(SEP_LENGTH);
+            System.out.println();
+            System.out.println("(1) Hi Toby! I'm " + player.getName() + " it's nice to meet you too!");
+            System.out.println("(2) Shut off the computer and leave");
+            choice = userChoice("->", 2);
+        }while(choice < 1);
+
+        // If you talk to Toby
+        if(choice == 1){
+           // talkWithTobyDayOne();
+            System.out.println("***CONVERSATION NOT YET IMPLEMENTED IN DEMO***");
+            anyInput();
+        }
+
+        System.out.println("\n*You shut off the computer and think that you should probably head back\n" +
+                " to your cubicle to finish up work for the day*");
+        anyInput();
+
+        player.removeObjective(Objective.FEED_AI);
+        fedAI = true;
+
+        // Updated accessible locations
+        updateLocationsDayOne();
+        addStoryStop(LocationName.CUBICLE);
+        clearConsole();
+        explorationLoop();
+        removeStoryStop(LocationName.CUBICLE);
+
+        // If player forgets to put back the SSD and Floppy, Deb is upset
+        if(player.inventoryContainsItem(clydeSSD) || player.inventoryContainsItem(tobyFloppy)){
+            clearConsole();
+            printLocation();
+            System.out.println("*You start to wrap up your work for the day when you notice Deb storm \n" +
+                    " across the office towards your cubicle*");
+            delayMs(1000);
+            printLine("Deb: Now listen here! I realize it's your first day on the job, but that doesn't excuse \n" +
+                      "     not following basic instructions. I can see the 8 inch floppy disk in your back \n" +
+                      "     pocket. You didn't put the floppy disk and ssd back in the safe. If I didn't notice \n" +
+                      "     it would have been my ass that got blamed when they couldn't find them tomorrow. Now \n" +
+                      "     give them here!\n");
+            System.out.println("*You hand her the drives and she storms off. You get the sense that you \n" +
+                    " made a poor first impression on Deb*");
+            deb.worsenOpinion(2);
+            printSeparator(SEP_LENGTH);
+            System.out.println();
+            player.removeItem(clydeSSD);
+            player.removeItem(tobyFloppy);
+            anyInput();
+        }
+
+        clearConsole();
+        printLocation();
+        System.out.println("*You sit down at your computer when Sam pokes his head into your cubicle*\n");
+        delayMs(1000);
+        printLine("Sam: Hey there! Quick task for ya before you head home. You see, theres a bug running \n" +
+                "     rampant in our code base right now. Can you see if you can track it down ASAP? \n" +
+                "     You can head home for the day after that. The task is on your dashboard.\n");
+        System.out.println("*You pull up your dashboard, take a look at the error logs, and start \n" +
+                " searching the code base for this bug*\n");
+        delayMs(1000);
+        anyInput();
+
+        // Find The Bug mini-game
+        FindTheBug findTheBug = new FindTheBug(16,3);
+        if(FindTheBug.getFoundBug()){
+            System.out.println("*Sam will be happy that the bug was found*");
+            sam.improveOpinion(1);
+        }else{
+            System.out.println("*Sam won't be happy that we weren't able to find the bug*");
+            sam.worsenOpinion(2);
+        }
+        System.out.println("*You pack up and head home for the day*");
+        anyInput();
+        clearConsole();
+        printHeading("THANK YOU");
+        System.out.println("Thank you for playing this demo of OpenMammaFAANG inc.!");
+        anyInput();
+        exitGame();
+    }
+
+    // If player chooses to talk with Toby more on day 1
+    public static void talkWithTobyDayOne(){
+        // ToDo
+    }
+
+    // Updates accessible locations near the end of day 1
+    public static void updateLocationsDayOne(){
+        Location location;
+
+        location = new Location(LocationName.SERVER_ROOM, "The heart of the company and " +
+                "the home of Clyde and Toby");
+        location.addNeighbor(LocationName.BASEMENT);
+        location.addAction(Action.LOOK_SAFE);
+
+        new Container("Server Room Safe","A safe in the server room used to securely " +
+                "store A.I. training data", Action.LOOK_SAFE);
+
+        location = Location.getLocation(LocationName.BASEMENT);
+        location.addNeighbor(LocationName.SERVER_ROOM);
+        location.addNeighbor(LocationName.ELEVATOR);
+
+        location = new Location(LocationName.ELEVATOR, "Just an elevator");
+        location.addNeighbor(LocationName.BASEMENT);
+        location.addNeighbor(LocationName.CUBICLE);
+
+        location = Location.getLocation(LocationName.CUBICLE);
+        location.addNeighbor(LocationName.ELEVATOR);
+        location.addAction(Action.END_DAY);
+    }
+
+    // Demo FindTheBug mini-game
+    public static void demoFindTheBug(){
+        clearConsole();
+        printHeading("FIND THE BUG");
+        System.out.println("*This is a demo of the mini-game Find The Bug. Your objective is to locate \n" +
+                           " the bug in the array before it can do serious damage. Good luck!*");
+        delayMs(1000);
+        anyInput();
+        new FindTheBug(16,3);
+        if(FindTheBug.getFoundBug()){
+            System.out.println("*Congratulations! You found the bug and beat the mini-game! Did you get lucky? \n" +
+                    " Or did you figure out the trick?*\n");
+            delayMs(1000);
+            anyInput();
+        }else{
+            System.out.println("*Good try, think about if there is a better strategy you could try*");
+            delayMs(1000);
+            anyInput();
+        }
+    }
+
+    // Demo CatchTheCopilot mini-game
+    public static void demoCatchTheCopilot(){
+        clearConsole();
+        printHeading("CATCH THE COPILOT");
+        System.out.println("*This is a demo of the mini-game Catch The Copilot. Your objective is to catch the \n" +
+                " Copilot that has escaped from its home drive. Catch it so it can keep producing \n" +
+                " broken code for us! Good luck!*");
+        delayMs(1000);
+        anyInput();
+        new CatchTheCopilot();
+        if(CatchTheCopilot.getCaughtTheCopilot()){
+            System.out.println("*Congratulations! You caught the escaped Copilot! Was it difficult? Or too easy \n");
+            delayMs(1000);
+            anyInput();
+        }else{
+            System.out.println("*Good try, think about if there is a better strategy you could try*");
+            delayMs(1000);
+            anyInput();
+        }
     }
 }

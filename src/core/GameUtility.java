@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 public class GameUtility {
     final public static int SEP_LENGTH = 60; // The default separator length
-    final private static int PRINT_DELAY = 50; // The delay in ms between chars when printLine is called
+    final private static int PRINT_DELAY = 40; // The delay in ms between chars when printLine is called
 
     public static Scanner scan = new Scanner(System.in);
 

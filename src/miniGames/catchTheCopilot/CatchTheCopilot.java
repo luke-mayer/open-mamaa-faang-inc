@@ -15,6 +15,11 @@ public class CatchTheCopilot extends JFrame {
         phaser.arriveAndAwaitAdvance();
     }
 
+    // Returns true if copilot is caught, false otherwise
+    public static boolean getCaughtTheCopilot(){
+        return Model.getCaughtCopilot();
+    }
+
     // Makes it so that main() resumes on Frame close
     private void addDeregister(){
         addWindowListener(new WindowAdapter() {

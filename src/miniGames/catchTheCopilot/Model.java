@@ -15,6 +15,7 @@ public class Model extends JPanel implements ActionListener {
     private Dimension d;
     private final Font smallFont = new Font("Arial", Font.BOLD, 18);
     private boolean inGame = false;
+    private boolean gameOver = false;
     private boolean dying = false;
     private boolean caught = false;
 
@@ -27,7 +28,7 @@ public class Model extends JPanel implements ActionListener {
     private final int PLAYER_SPEED = 6;
     private final int COPILOT_SPEED = 6;
 
-    private int N_MALWARE = 12;
+    private int N_MALWARE = 8;
     private int lives, score;
     private int[] dx, dy, c_dx,c_dy;
     private int[] malware_x, malware_y, malware_dx, malware_dy, malwareSpeed;
@@ -148,8 +149,8 @@ public class Model extends JPanel implements ActionListener {
     private void drawScore(Graphics2D g) {
         g.setFont(smallFont);
         g.setColor(new Color(5, 181, 79));
-        String s = "Score: " + score;
-        g.drawString(s, SCREEN_SIZE / 2 + 96, SCREEN_SIZE + 16);
+      //  String s = "Score: " + score;
+      //  g.drawString(s, SCREEN_SIZE / 2 + 96, SCREEN_SIZE + 16);
 
         for (int i = 0; i < lives; i++) {
             g.drawImage(heart, i * 28 + 8, SCREEN_SIZE + 1, this);
@@ -200,7 +201,8 @@ public class Model extends JPanel implements ActionListener {
 
         if (lives == 0) {
             inGame = false;
-            start = "*ERROR* SYSTEM FAILURE - Copilot evaded you.";
+            gameOver = true;
+            start = "*ERROR* SYSTEM FAILURE - Copilot evaded you";
         }
 
         continueLevel();
@@ -449,7 +451,7 @@ public class Model extends JPanel implements ActionListener {
         lives = 3;
         score = 0;
         initLevel();
-        N_MALWARE = 12;
+        N_MALWARE = 8;
         currentSpeed = 4;
     }
 
@@ -486,8 +488,8 @@ public class Model extends JPanel implements ActionListener {
 
         for (int i = N_MALWARE * 3 / 4; i < N_MALWARE; i++) {
 
-            malware_y[i] = 2 * BLOCK_SIZE; //start position
-            malware_x[i] = 2 * BLOCK_SIZE;
+            malware_y[i] = 10 * BLOCK_SIZE; //start position
+            malware_x[i] = 14 * BLOCK_SIZE;
             malware_dy[i] = 0;
             malware_dx[i] = dx;
             dx = -dx;
@@ -500,8 +502,8 @@ public class Model extends JPanel implements ActionListener {
             malwareSpeed[i] = validSpeeds[random];
         }
 
-        copilot_x = 2 * BLOCK_SIZE;  //start position
-        copilot_y = 2 * BLOCK_SIZE;
+        copilot_x = 10 * BLOCK_SIZE;  //start position
+        copilot_y = 14 * BLOCK_SIZE;
         copilot_dx = 1;	//reset direction move
         copilot_dy = 0;
 
@@ -562,7 +564,7 @@ public class Model extends JPanel implements ActionListener {
                     inGame = false;
                 }
             } else {
-                if (key == KeyEvent.VK_SPACE) {
+                if (key == KeyEvent.VK_SPACE && !gameOver) {
                     inGame = true;
                     initGame();
                 }
